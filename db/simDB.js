@@ -1,7 +1,7 @@
 'use strict';
 
 // Simple In-Memory Database (async-callback version)
-const DELAY = 250;
+const DELAY = 1000;
 
 const simDB = {
   
@@ -29,6 +29,7 @@ const simDB = {
   },
 
   filter: function (term, callback) {
+    
     setTimeout(() => {
       try {
         let list = term ? this.data.filter(item => item.title.includes(term)) : this.data;
