@@ -68,24 +68,40 @@ const noteful = (function () {
   function handleNoteFormSubmit() {
     $('.js-note-edit-form').on('submit', function (event) {
       event.preventDefault();
-
+  
       const editForm = $(event.currentTarget);
+  
       const noteObj = {
         id: store.currentNote.id,
         title: editForm.find('.js-note-title-entry').val(),
         content: editForm.find('.js-note-content-entry').val()
-      };  
-      if(noteObj.id){
+      };
+  
+      if (store.currentNote.id) {
+  
         api.update(store.currentNote.id, noteObj, updateResponse => {
           store.currentNote = updateResponse;
-          api.search(store.currentSearchTerm, searchResponse => {
-            store.notes = searchResponse;
+  
+          api.search(store.currentSearchTerm, updateResponse => {
+            store.notes = updateResponse;
             render();
           });
+  
         });
-      } else { 
-        console.log('Create Note, coming soon..');
+  
+      } else {
+  
+        api.create(noteObj, updateResponse => {
+          store.currentNote = updateResponse;
+  
+          api.search(store.currentSearchTerm, updateResponse => {
+            store.notes = updateResponse;
+            render();
+          });
+  
+        });
       }
+  
     });
   }
     
@@ -93,20 +109,26 @@ const noteful = (function () {
   function handleNoteStartNewSubmit() {
     $('.js-start-new-note-form').on('submit', event => {
       event.preventDefault();
-
-      console.log('Start New Note, coming soon...');
-
+      store.currentNote = false;
+      render();
     });
   }
 
   function handleNoteDeleteClick() {
     $('.js-notes-list').on('click', '.js-note-delete-button', event => {
       event.preventDefault();
-
+      const id = getNoteIdFromElement(event.currentTarget);
+      api.delete(id,()=>{
+        api.search(store.currentSearchTerm, searchResponse =>{
+          store.notes = searchResponse;
+          render();
+        });
+      });
       console.log('Delete Note, coming soon...');
-      
     });
   }
+
+  
 
   function bindEventListeners() {
     handleNoteItemClick();
