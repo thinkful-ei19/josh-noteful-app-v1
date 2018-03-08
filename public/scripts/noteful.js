@@ -64,6 +64,12 @@ const noteful = (function () {
         });
     });
   }
+  function searchApiWithTerm(searchTerm){
+    api.search(searchTerm).then(searchResponse =>{
+      store.notes = searchResponse;
+      render();
+    });
+  }
 
   function handleNoteFormSubmit() {
     $('.js-note-edit-form').on('submit', function (event) {
@@ -77,28 +83,30 @@ const noteful = (function () {
         content: editForm.find('.js-note-content-entry').val()
       };
   
-      if (store.currentNote.id) {
+      if (noteObj.id) {
   
         api.update(store.currentNote.id, noteObj)
           .then(updateResponse => {
             store.currentNote = updateResponse;
-            return api.search(store.currentSearchTerm);
-          })
-          .then(searchResponse => {
+            //return api.search(store.currentSearchTerm);
+            searchApiWithTerm(store.currentSearchTerm);
+          });
+        /*.then(searchResponse =>{
             store.notes = searchResponse;
             render();
-          });
+          });*/
       } else {
   
         api.create(noteObj)
           .then(createResponse => {
             store.currentNote = createResponse;
-            return api.search(store.currentSearchTerm);
-          })
-          .then(searchResponse => {
+            //return api.search(store.currentSearchTerm);
+            searchApiWithTerm(store.currentSearchTerm);
+          });
+        /*.then(searchResponse =>{
             store.notes = searchResponse;
             render();
-          });
+          });*/
       }
     });
   }
@@ -120,8 +128,8 @@ const noteful = (function () {
       
       api.delete(id)
         .then(() => api.search(store.currentSearchTerm))
-        .then(searchResponse => {
-          store.notes = searchResponse;
+        .then(searchResponse=>{
+          store.notes=searchResponse;
           if(id === store.currentNote.id) {
             store.currentNote = {};
           }
@@ -129,6 +137,7 @@ const noteful = (function () {
         });
     });
   }
+
 
   
 
@@ -145,6 +154,7 @@ const noteful = (function () {
   return {
     render: render,
     bindEventListeners: bindEventListeners,
+    searchApiWithTerm
   };
 
 }());
